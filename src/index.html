@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+</head>
+<body>
+    <h1>BLOCKCHAIN GAME</h1>
+    <h2>Score : <span class="score"></span></h2>
+    <h1>Time : <span class="time"></span></h1>
+    <script>
+        const spanScore = document.querySelector('.score')
+        const spanTime = document.querySelector('.time')
+        let cursors, knight,crates, coinTimer, timeLeftText
+        let score = 0 
+        let time = 60
+        let config = {
+            width: 800,
+            height: 500,
+            type : Phaser.AUTO,
+            scene: {
+                preload: gamePreload,
+                create : gameCreate,
+                update: gameUpdate ,
+            },
+            physics:{
+                default:"arcade",
+                arcade:{
+                    gravity:{y:800},
+                    debug:false
+                }
+            }
+        }
+        function gamePreload(){
+            console.log("Loading assets...")
+            this.load.image("knight", "../assets/knight.png")
+            this.load.image("crate", "../assets/crate.png")
+            this.load.image("background", "../assets/background.png")
+            this.load.image("tree", "../assets/tree3.png")
+            this.load.image("coin","../assets/bitcoin.png" )
+
+            //laod run animation
+            this.load.image("run_frame_1", "../assets/knight/run/Run (1).png")
+            this.load.image("run_frame_2", "../assets/knight/run/Run (2).png")
+            this.load.image("run_frame_3", "../assets/knight/run/Run (3).png")
+            this.load.image("run_frame_4", "../assets/knight/run/Run (4).png")
+            this.load.image("run_frame_5", "../assets/knight/run/Run (5).png")
+            this.load.image("run_frame_6", "../assets/knight/run/Run (6).png")
+            this.load.image("run_frame_7", "../assets/knight/run/Run (7).png")
+            this.load.image("run_frame_8", "../assets/knight/run/Run (8).png")
+            this.load.image("run_frame_9", "../assets/knight/run/Run (9).png")
+            this.load.image("run_frame_10", "../assets/knight/run/Run (10).png")
+
+            //load idle animation
+            this.load.image("idle_frame_1", "../assets/knight/idle/Idle (1).png")
+            this.load.image("idle_frame_2", "../assets/knight/idle/Idle (2).png")
+            this.load.image("idle_frame_3", "../assets/knight/idle/Idle (3).png")
+            this.load.image("idle_frame_4", "../assets/knight/idle/Idle (4).png")
+            this.load.image("idle_frame_1", "../assets/knight/idle/Idle (5).png")
+            this.load.image("idle_frame_6", "../assets/knight/idle/Idle (6).png")
+            this.load.image("idle_frame_7", "../assets/knight/idle/Idle (7).png")
+            this.load.image("idle_frame_8", "../assets/knight/idle/Idle (8).png")
+            this.load.image("idle_frame_9", "../assets/knight/idle/Idle (9).png")
+        }
+        
+        function gameCreate(){
+            // add background images
+            this.add.image(300,150, "background")
+            this.add.image(300,270, "tree")
+
+
+
+            // add knight
+            knight = this.physics.add.sprite(100,100, "knight")
+            knight.body.setSize(500,650,0)
+            knight.scaleX = 0.15
+            knight.scaleY = 0.15
+
+            //add crates
+            crates = this.physics.add.staticGroup()
+            crates.create(40,460, "crate")
+            crates.create(120,460, "crate")
+            crates.create(200,460, "crate")
+            crates.create(280,460, "crate")
+            crates.create(360,460, "crate")
+            crates.create(440,460, "crate")
+            crates.create(740,460, "crate")
+            crates.create(520,360, "crate")
+
+            //add coins
+
+
+            //create animations
+            this.anims.create({
+                key: "knight_run",
+                frames : [
+                    {key: "run_frame_1"},
+                    {key: "run_frame_2"},
+                    {key: "run_frame_3"},
+                    {key: "run_frame_4"},
+                    {key: "run_frame_5"},
+                    {key: "run_frame_6"},
+                    {key: "run_frame_7"},
+                    {key: "run_frame_8"},
+                    {key: "run_frame_9"},
+                    {key: "run_frame_10"},
+                ],
+                frameRate:10,
+                repeat:1
+            })
+
+            this.anims.create({
+                key: "knight_idle",
+                frames : [
+                    {key: "idle_frame_1"},
+                    {key: "idle_frame_2"},
+                    {key: "idle_frame_3"},
+                    {key: "idle_frame_4"},
+                    {key: "idle_frame_5"},
+                    {key: "idle_frame_6"},
+                    {key: "idle_frame_7"},
+                    {key: "idle_frame_8"},
+                    {key: "idle_frame_9"},
+                ],
+                frameRate:10,
+                repeat:1
+            })
+            
+            //add collission to crates
+            this.physics.add.collider(crates, knight)
+
+            // keyboard event listener
+            cursors = this.input.keyboard.createCursorKeys()
+
+            //add coin generator
+            coinTimer = this.time.addEvent({
+                delay:Phaser.Math.Between(0,3000),
+                callback: generateCoins,
+                callbackScope : this,
+                repeat: -1
+            })
+
+            //add time left counter
+
+            timeLeftText = this.time.addEvent({
+                delay : 1000,
+                callback : reduceTime,
+                callbackScope : this,
+                repeat : 59
+            })
+
+            
+
+        }
+
+        function reduceTime(){
+            time --
+            spanTime.innerHTML = time
+
+        }
+
+        function collectCoin(knight, coin){
+            score++
+            coin.disableBody(true, true)
+            spanScore.innerText = score
+        }
+
+        function generateCoins(){
+            if(time>0){
+
+                var coins = this.physics.add.group({
+                    key:"coin",
+                    repeat:1,
+                    setXY : {
+                        x: Phaser.Math.Between(0,800),
+                        y : -100,
+                        stepX : Phaser.Math.Between(30,100)
+                    }
+                })
+                coins.children.iterate(child=>{
+                    // make each coin of the group bouncable
+                    child.setBounceY(Phaser.Math.FloatBetween(0.4 , 1.5))
+                })
+                this.physics.add.collider(coins, crates)
+                this.physics.add.overlap(knight, coins ,collectCoin, null, this)
+                
+            }
+        }
+
+        function gameUpdate(){ 
+            // keyboard controls
+            if(cursors.left.isDown){
+                knight.setVelocityX(-200)
+                knight.play("knight_run", true)
+                knight.flipX = true
+            }
+            else if(cursors.right.isDown){
+                knight.setVelocityX(200)
+                knight.play("knight_run", true)
+                knight.flipX = false
+            }   
+            else if(cursors.up.isDown ||cursors.down.isDown  ){
+                knight.setVelocityY(-400)
+
+            }
+            else{
+                knight.setVelocityX(0)
+            }
+        }
+
+        let game = new Phaser.Game(config)
+        
+    </script>
+</body>
+</html>
