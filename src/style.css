@@ -1,0 +1,20 @@
+.buttons{
+    display: flex;
+}
+button{
+    padding:2px 8px;
+    color:white;
+    border-radius: 15px;
+}
+
+.buy-talisman{
+    background-color: black;
+}
+
+.buy-boots{
+    background-color: green;
+}
+
+.buy-time{
+    background-color: blue;
+}

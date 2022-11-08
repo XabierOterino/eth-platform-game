@@ -29,8 +29,8 @@ contract Marketplace {
         address _from,
         uint256 _id,
         uint256 _value,
-        bytes32 calldata _data
-    ) {
+        bytes32 _data
+    ) public view returns (bytes4) {
         return
             bytes4(
                 keccak256(

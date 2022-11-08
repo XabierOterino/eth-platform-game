@@ -6,12 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <h1>BLOCKCHAIN GAME</h1>
     <h2>Score : <span class="score"></span></h2>
     <h1>Time : <span class="time"></span></h1>
+    <div class="buittons">
+        <button class="buy-talisman">Buy Pump Talisman 0,0001eth</button>
+        <button class="buy-boots">Buy Super Boots 0.0002eth</button>
+        <button class="buy-time">Buy Time Warp 0,0003eth</button>
+    </div>
     <script>
+        
+
         const spanScore = document.querySelector('.score')
         const spanTime = document.querySelector('.time')
         let cursors, knight,crates, coinTimer, timeLeftText
@@ -214,5 +222,6 @@
         let game = new Phaser.Game(config)
         
     </script>
+    <script src="./eth.js"></script>
 </body>
 </html>
